@@ -22,9 +22,11 @@ exports.generateQuestionText = function (randomStream, params){
    }
 
    var varNameList = ["a","b","c","d","e","f","g","h","p","q","r","s","t","w","x","y","z"];
+   var doubleVarNameList = varNameList.concat(varNameList);
 
    var numVarsNeeded = typeNames.length * 2;
-   var varNames = randomStream.cut(varNameList).slice(0,numVarsNeeded);
+   var start = randomStream.nextIntRange(varNameList.length);
+   var varNames = (doubleVarNameList).slice(start,start+numVarsNeeded);
 
    var declarations = [];
 
@@ -132,7 +134,6 @@ exports.generateQuestionText = function (randomStream, params){
    }
 
    result += "</ol>\n";
-	 
   return result;
 
 }
@@ -155,7 +156,7 @@ exports.generate = function(randomStream, params) {
         title : exports.title,
         format : 'free-response',
         question : exports.generateQuestionText(randomStream, params),
-        answer : exports.generateAnswer("think about this harder")
+        answer : 'later' //exports.generateAnswer("think about this harder")
     };
 	return question;
 };
