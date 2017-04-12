@@ -1,179 +1,161 @@
-exports.title = "Change of Base Free Response";
+exports.title = "C Pointer Types";
 
-exports.paramSchema = {
-    title: 'fr-change-of-base',
-    type: 'object',
-    additionalProperties: false,
-    
-    properties: {
-        'conversions': {
-            type: 'array',
-            items: {
-                type: 'object',
-                required: ['radix', 'range'],
-                additionalProperties: false,
-                
-                properties: {
-                    'radix': {
-                        type: 'object',
-                        required: ['from', 'to'],
-                        additionalProperties: false,
-                        
-                        properties: {
-                            'from': {
-                                type: 'integer',
-                                minimum: 2,
-                                maximum: 36,
-                            },
-                            'to': {
-                                type: 'integer',
-                                minimum: 2,
-                                maximum: 36,
-                                not: {constant: {'$data': '1/from'}},
-                            },
-                        },
-                    },
-                    'range': {
-                        type: 'object',
-                        required: ['min', 'max'],
-                        additionalProperties: false,
-                        
-                        properties: {
-                            'min': {
-                                type: 'integer',
-                                minimum: 0,
-                            },
-                            'max': {
-                                type: 'integer',
-                                minimum: {'$data': '1/min'},
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        'spaceBinary': {
-            type: 'boolean',
-        },
-    },
-};
+// for now we have no parameters because it isn't parameterizable
+// we don't even have an outputType since we will start with only free-response
+// later we need to add at least outputType and then also checking with the schema
+// one param we could add is points per question? 
+// no code for generating answers
 
-Number.isSafeInteger = Number.isSafeInteger || function(n) {
-    return Math.round(n) == n &&
-        n < Math.pow(2, 53) &&
-        n > -Math.pow(2, 53);
+
+exports.generateQuestionText = function (randomStream, params){ 
+
+   var result="";
+
+   var typeNamesList = ["int","double","char","Node"];
+   var numTypes = typeNamesList.length;
+   randomStream.shuffle(typeNamesList);
+   var typeNames = typeNamesList.slice(0);
+
+
+   for (var i=0; i<typeNamesList.length; i++) {
+       typeNames.push(typeNamesList[i] + " *");
+   }
+
+   var varNameList = ["a","b","c","d","e","f","g","h","p","q","r","s","t","w","x","y","z"];
+
+   var numVarsNeeded = typeNames.length * 2;
+   var varNames = randomStream.cut(varNameList).slice(0,numVarsNeeded);
+
+   var declarations = [];
+
+   for (var i=0; i<typeNames.length; i++) {
+       var thisOne = typeNames[i] + " " + varNames[i];
+       thisOne = thisOne.replace(" * "," *");
+       declarations.push(thisOne);
+   }
+
+   // Now we have:
+   //  varNames is the list of variables names
+   //  typeNames is the list of types names
+   //  declarations is the list of declarations (without semicolons);
+   // The types are permuted, and the variable names are cut.
+   // BUT: 0..(numTypes-1) are standard
+   // BUT: numTypes..(numTypes*2-1) are pointer types
+   // and the types are numTypes offset from each other.  i.e. if [i] is int, then [i+numTypes] is int *
+
+   preContents = "<pre>\n\nstruct Node {\n  int data;\n  Node *next;\n};\n\n\nint main(int argc, char *argv[]) {\n";
+   
+   for (var i=0;i<declarations.length; i++) {
+       preContents += "  " + declarations[i] + ";\n";
+   }
+   preContents += "\n\n  return 0;\n}\n\n</pre>";
+
+
+   // Now for the questions:
+   // For this exam: we have these types
+   //  (1) Non pointer variable, undecorated
+   //  (2) Pointer variable, undecorated
+   //  (3) Non pointer variable with &
+   //  (4) Pointer variables with &
+   //  (5) Pointer variable, deferenced
+   //  (6) argc  
+   //  (7) argv[0]  
+   //  (8) argv[1][2]  
+   //  (9) Node * with arrow to next
+   //  (10) Node * with arrow to data
+   
+   var questions=[];
+   var k;
+
+   //  (1) Non pointer variable, undecorated
+   k = randomStream.nextIntRange(numTypes);
+   questions.push( { q: varNames[k], a:  typeNames[k] });
+
+   //  (2) Pointer variable, undecorated
+
+   k = randomStream.nextIntRange(numTypes);
+   questions.push( { q: varNames[numTypes + k], a:  typeNames[numTypes + k] });
+
+   //  (3) Non pointer variable with &
+
+   k = randomStream.nextIntRange(numTypes);
+   questions.push( { q: "&" + varNames[k], a:  typeNames[k] + " *" });
+
+   //  (4) Pointer variables with &
+
+   k = randomStream.nextIntRange(numTypes);
+   questions.push( { q: "&" + varNames[numTypes + k], a:  typeNames[numTypes + k] + "*" });
+
+   //  (5) Pointer variable, deferenced
+
+   k = randomStream.nextIntRange(numTypes);
+   questions.push( { q: "*" + varNames[numTypes + k], a:  typeNames[numTypes + k].replace(" *","") });
+
+   //  (6) argc  
+
+   questions.push( { q: "argc", a: "int"});
+
+   //  (7) argv[0]  
+
+   questions.push( { q: "argv[0]", a: "char *"});
+
+   //  (8) argv[1][2]  
+
+   questions.push( { q: "argv[1][2]", a: "char"});
+
+   //  (9) Node * with arrow to next
+
+   var nodeStar = typeNames.indexOf("Node *");
+   questions.push( { q: varNames[nodeStar]+"->next", a: "Node *" });
+   
+   //  (10) Node * with arrow to data
+
+   questions.push( { q: varNames[nodeStar]+"->data", a: "int" });
+
+   // (11) Two levels of pointer
+
+   questions.push( { q: varNames[nodeStar]+"->next->next", a: "Node *" });
+
+   randomStream.shuffle(questions);
+
+   result += "<p>Given the following declarations:</p>";
+   result += preContents;
+   result += "<p>Specify the type of each of these expressions (e.g. <code>int</code>, <code>int *</code>, etc.</p>";
+
+   result += "<ol>";
+
+   for (var i=0; i<questions.length; i++) {
+       result += "<li> (" + pointsEach + " pts) ";
+       result += questions[i].q;
+       result += "<span class='answer' style='padding-left:4em;'>" + questions[i].a + "</span>";
+       result += "</li>\n";
+   }
+
+   result += "</ol>\n";
+	 
+  return result;
+
 }
 
-exports.defaultConversions = [ 
-    { radix:{ from: 10, to: 2 }, range:{ min: 0, max: 255} },
-    { radix:{ from: 2, to: 10 }, range:{ min: 0, max: 255} },
-    { radix:{ from: 2, to: 8 }, range:{ min: 0, max: 511 } },
-    { radix:{ from: 8, to: 2 }, range:{ min: 0, max: 63 } },
-    { radix:{ from: 2, to: 16 }, range:{ min: 0, max: 65535} },
-    { radix:{ from: 16, to: 2 }, range:{ min: 0, max: 65535} } 
-];
-
-exports.radixDescription = function (radix, useBase) {
-    if (useBase)
-        return "base " + radix;
-    switch(radix) {
-        case 8: return "octal";
-        case 16: return "hexadecimal";
-        case 2: return "binary";
-        case 10: return "decimal";
-        default: return "base " + radix;
-    }
-}
-
-
-exports.getConversion = function(randomStream, params, defaultValue) {
-    var conversions = defaultValue;
-    if (params && params.conversions && params.conversions.length > 0)
-    	conversions = params.conversions;
-    return randomStream.pick(conversions);
-}
-
-exports.formatFrom = function(from, fromRad, toRad) {
-    if (fromRad != 2 || (toRad != 8 && toRad != 16)) 
-    	return from;
-    var groupSize = (toRad == 8) ? 3 : 4;
-    return exports.formatBinary(from, groupSize);
-}
-
-exports.formatAnswer = function(answer, fromRad, toRad) {
-    if (toRad != 2 || (fromRad != 8 && fromRad != 16))
-    	return answer;
-    var groupSize = (fromRad == 8) ? 3 : 4;
-    return exports.formatBinary(answer, groupSize);
-}
-
-exports.nZeros = function(n) {
-    if (typeof n != 'number' || !Number.isSafeInteger(n)) {
-        throw new TypeError("nonnegative integer expected");
-    }
-    if (n < 0) {
-        throw new RangeError("nonnegative integer expected");
-    }
-    return Array(n+1).join("0");
-}
-
-exports.formatBinary = function(str, groupSize) {
-    if (str.length == 0) {
-        return ""; // not handled automatically: regexp match returns null for no matches
-    }
-    if (groupSize == 0) {
-        return str;
-    }
-    if (str.length % groupSize != 0) {
-        str = exports.nZeros(groupSize - str.length % groupSize) + str;
-    }
-    return str.match(new RegExp('.{' + groupSize + '}', 'g')).join(" ");
-}
 
 
 
-exports.generateQuestionText = function (qInputs){ // fromRad, toRad, spaceBinary, fromDesc, toDesc
-    var numToConvertInFromRadix = qInputs.numToConvert.toString(qInputs.fromRad);
-    if (qInputs.spaceBinary)
-    	numToConvertInFromRadix = 
-            exports.formatFrom(numToConvertInFromRadix, qInputs.fromRad, qInputs.toRad);
-    return "Convert " + numToConvertInFromRadix + " from " + qInputs.fromDesc + " to " + qInputs.toDesc + ".";
-}
-
-exports.getSpaceBinary = function(params) {
-	return (params && 'spaceBinary' in params) ? params.spaceBinary : true;
-}
-
-exports.generateQInputs = function(randomStream, params) {
-    var conversion = exports.getConversion(randomStream, params, exports.defaultConversions);
-
-    var fromRad = conversion.radix.from;
-    var toRad = conversion.radix.to;
-    var qInputs = {
-        spaceBinary : exports.getSpaceBinary(params),
-        numToConvert : randomStream.randIntBetweenInclusive(conversion.range.min, conversion.range.max),
-        fromRad : fromRad,
-        toRad : toRad,     
-        fromDesc : exports.radixDescription(fromRad, randomStream.nextIntRange(2)),
-        toDesc : exports.radixDescription(toRad, randomStream.nextIntRange(2))
-    };
-    return qInputs;
-}
 
 exports.generateAnswer = function(qInputs) {
-    var answer = qInputs.numToConvert.toString(qInputs.toRad);
-    if (qInputs.spaceBinary)
-        answer = exports.formatAnswer(answer, qInputs.fromRad, qInputs.toRad);
+    answer = "we can't keep using the stream but must generate answers when we generate q's"
     return answer;
 }
 
 exports.generate = function(randomStream, params) {
-    var qInputs = exports.generateQInputs(randomStream, params);
+    //var qInputs = exports.generateQInputs(randomStream, params);
+    // left in as model for how to do this once we have params
+    //  maybe even without the params we should do this since it is needed both to 
+    //  generate the questions and the answers
     var question = {
         title : exports.title,
         format : 'free-response',
-        question : exports.generateQuestionText(qInputs),
-        answer : exports.generateAnswer(qInputs)
+        question : exports.generateQuestionText(randomStream, params),
+        answer : exports.generateAnswer("think about this harder")
     };
 	return question;
 };
