@@ -7,7 +7,7 @@ exports.title = "C Pointer Types";
 // no code for generating answers
 
 
-exports.generateQuestion = function (randomStream, params){ 
+exports.generateQuestion = function (randomStream){ 
 
    var result="";
 
