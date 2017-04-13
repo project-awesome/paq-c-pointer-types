@@ -150,9 +150,9 @@ exports.generate = function(randomStream, params) {
             "question" : fullQuestionAndAnswer.questions[i].q,
             "answer" : fullQuestionAndAnswer.questions[i].a
         };
-        newQuizElements.concat([newQuestion]);
+    }
+    newQuizElements.concat([newQuestion]);
     
-    };
 	return newQuizElements;
 };
 
