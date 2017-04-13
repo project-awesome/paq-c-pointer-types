@@ -127,7 +127,7 @@ exports.generateQuestionText = function (randomStream, params){
    result += "<ol>";
 
    for (var i=0; i<questions.length; i++) {
-       result += "<li> (" 1 pt) ";
+       result += "<li> (1 pt) ";
        result += questions[i].q;
        result += "<span class='answer' style='padding-left:4em;'>" + questions[i].a + "</span>";
        result += "</li>\n";
