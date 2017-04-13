@@ -141,7 +141,7 @@ exports.generate = function(randomStream, params) {
     // then return an array of quizElements
     //   first the label that is the declarations
     //   then each question that is the sub part with the associated answer
-    var fullQuestionAndAnswer = generateQuestion(randomStream);
+    var fullQuestionAndAnswer = exports.generateQuestion(randomStream);
     var newQuizElements = [{"label": fullQuestionAndAnswer.initialLabel}]
     for (i=0; i< fullQuestionAndAnswer.questions.length; i++) {
         var newQuestion = {
