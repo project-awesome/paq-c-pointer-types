@@ -7,7 +7,7 @@ exports.title = "C Pointer Types";
 // no code for generating answers
 
 
-exports.generateQuestionText = function (randomStream, params){ 
+exports.generateQuestion = function (randomStream, params){ 
 
    var result="";
 
@@ -45,12 +45,12 @@ exports.generateQuestionText = function (randomStream, params){
    // BUT: numTypes..(numTypes*2-1) are pointer types
    // and the types are numTypes offset from each other.  i.e. if [i] is int, then [i+numTypes] is int *
 
-   preContents = "<pre>\n\nstruct Node {\n  int data;\n  Node *next;\n};\n\n\nint main(int argc, char *argv[]) {\n";
+   preContents = "\n\nstruct Node {\n  int data;\n  Node *next;\n};\n\n\nint main(int argc, char *argv[]) {\n";
    
    for (var i=0;i<declarations.length; i++) {
        preContents += "  " + declarations[i] + ";\n";
    }
-   preContents += "\n\n  return 0;\n}\n\n</pre>";
+   preContents += "\n\n  return 0;\n}\n\n";
 
 
    // Now for the questions:
@@ -120,45 +120,40 @@ exports.generateQuestionText = function (randomStream, params){
 
    randomStream.shuffle(questions);
 
-   result += "<p>Given the following declarations:</p>";
-   result += preContents;
-   result += "<p>Specify the type of each of these expressions (e.g. <code>int</code>, <code>int *</code>, etc.</p>";
+   preContents = "Given the following declarations:\n" + preContents;
+   preContents += "\nSpecify the type of each of these expressions (e.g. int, int *, etc.\n";
 
-   result += "<ol>";
+//XXX this is yucky because without HTML or latex or a committment to one of
+// these now we don't know how to tag <code> in the json for a question
 
-   for (var i=0; i<questions.length; i++) {
-       result += "<li> (1 pt) ";
-       result += questions[i].q;
-       result += "<span class='answer' style='padding-left:4em;'>" + questions[i].a + "</span>";
-       result += "</li>\n";
-   }
+       //result += questions[i].q;
+       //result += questions[i].a + "</span>";
 
-   result += "</ol>\n";
+  result = {"initialLabel": preContents, 
+            "questions": questions}
   return result;
 
 }
 
-
-
-
-
-exports.generateAnswer = function(qInputs) {
-    answer = "we can't keep using the stream but must generate answers when we generate q's"
-    return answer;
-}
-
 exports.generate = function(randomStream, params) {
-    //var qInputs = exports.generateQInputs(randomStream, params);
-    // left in as model for how to do this once we have params
-    //  maybe even without the params we should do this since it is needed both to 
-    //  generate the questions and the answers
-    var question = {
-        title : exports.title,
-        format : 'free-response',
-        question : exports.generateQuestionText(randomStream, params),
-        answer : 'later' //exports.generateAnswer("think about this harder")
+    //plan
+    //generate the full list of questions and answers
+    // then return an array of quizElements
+    //   first the label that is the declarations
+    //   then each question that is the sub part with the associated answer
+    var fullQuestionAndAnswer = generateQuestion(randomStream);
+    var newQuizElements = [{"label": fullQuestionAndAnswer.initialLabel}]
+    for (i=0; i< fullQuestionAndAnswer.questions.length; i++) {
+        var newQuestion = {
+            "title" : "is this needed?",
+            "format" : "free-response",
+            "question" : fullQuestionAndAnswer.questions[i].q,
+            "answer" : fullQuestionAndAnswer.questions[i].a
+        };
+        newQuizElements.concat([newQuestion]);
+    
     };
-	return question;
+	return newQuizElements;
 };
 
 
