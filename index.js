@@ -9,8 +9,6 @@ exports.title = "C Pointer Types";
 
 exports.generateQuestion = function (randomStream){ 
 
-   var result="";
-
    var typeNamesList = ["int","double","char","Node"];
    var numTypes = typeNamesList.length;
    randomStream.shuffle(typeNamesList);
@@ -126,10 +124,7 @@ exports.generateQuestion = function (randomStream){
 //XXX this is yucky because without HTML or latex or a committment to one of
 // these now we don't know how to tag <code> in the json for a question
 
-       //result += questions[i].q;
-       //result += questions[i].a + "</span>";
-
-  result = {"initialLabel": preContents, 
+  var result = {"initialLabel": preContents, 
             "questions": questions}
   return result;
 
@@ -144,14 +139,15 @@ exports.generate = function(randomStream, params) {
     var fullQuestionAndAnswer = exports.generateQuestion(randomStream);
     var newQuizElements = [{"label": fullQuestionAndAnswer.initialLabel}]
     for (i=0; i< fullQuestionAndAnswer.questions.length; i++) {
+        console.log("element: "+ i);
         var newQuestion = {
             "title" : "is this needed?",
             "format" : "free-response",
             "question" : fullQuestionAndAnswer.questions[i].q,
             "answer" : fullQuestionAndAnswer.questions[i].a
         };
+        newQuizElements.concat([newQuestion]);
     }
-    newQuizElements.concat([newQuestion]);
     
 	return newQuizElements;
 };
