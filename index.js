@@ -141,12 +141,13 @@ exports.generate = function(randomStream, params) {
     for (i=0; i< fullQuestionAndAnswer.questions.length; i++) {
         console.log("element: "+ i);
         var newQuestion = {
-            "title" : "is this needed?",
+            "title" : "element: "+ i,
             "format" : "free-response",
             "question" : fullQuestionAndAnswer.questions[i].q,
             "answer" : fullQuestionAndAnswer.questions[i].a
         };
-        newQuizElements.concat([newQuestion]);
+        console.log(JSON.stringify(newQuestion));
+        newQuizElements.push(newQuestion);
     }
     
 	return newQuizElements;
