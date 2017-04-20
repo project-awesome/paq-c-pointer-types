@@ -118,11 +118,8 @@ exports.generateQuestion = function (randomStream){
 
    randomStream.shuffle(questions);
 
-   preContents = "Given the following declarations:\n" + preContents;
-   preContents += "\nSpecify the type of each of these expressions (e.g. int, int *, etc.\n";
-
-//XXX this is yucky because without HTML or latex or a committment to one of
-// these now we don't know how to tag <code> in the json for a question
+   preContents = "Given the following declarations:<br/>" + preContents;
+   preContents += "Specify the type of each of these expressions (e.g. <code>int</code>, <code>int *</code>, etc.<br/>";
 
   var result = {"initialLabel": preContents, 
             "questions": questions}
@@ -130,8 +127,8 @@ exports.generateQuestion = function (randomStream){
 
 }
 
-exports.generate = function(randomStream, params) {
-    //plan
+exports.generate = function(randomStream, quizElement) {
+    //PLAN: 
     //generate the full list of questions and answers
     // then return an array of quizElements
     //   first the label that is the declarations
@@ -140,11 +137,16 @@ exports.generate = function(randomStream, params) {
     var newQuizElements = [{"label": fullQuestionAndAnswer.initialLabel}]
     for (i=0; i< fullQuestionAndAnswer.questions.length; i++) {
         var newQuestion = {
-            "title" : "subquestion: "+ i,
-            "format" : "free-response",
-            "question" : fullQuestionAndAnswer.questions[i].q,
-            "answer" : fullQuestionAndAnswer.questions[i].a
+            "outputType" : "fr",
+            "problemType" : "paq-C-pointer-types",
+            "questionText" : fullQuestionAndAnswer.questions[i].q,
+            "answer" : fullQuestionAndAnswer.questions[i].a,
         };
+        // XXX consider changing this to points per sub part and putting in params
+        //     also consider a warning if points and points per sub are provided and don't sync
+        if ("points" in quizElement) {
+            newQuestion.points = quizElement.points;
+        }
         newQuizElements.push(newQuestion);
     }
     
