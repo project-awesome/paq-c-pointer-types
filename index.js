@@ -43,12 +43,12 @@ exports.generateQuestion = function (randomStream){
    // BUT: numTypes..(numTypes*2-1) are pointer types
    // and the types are numTypes offset from each other.  i.e. if [i] is int, then [i+numTypes] is int *
 
-   preContents = "\n\nstruct Node {\n  int data;\n  Node *next;\n};\n\n\nint main(int argc, char *argv[]) {\n";
+   preContents = "<br/>nstruct Node {<br/>  int data;<br/>  Node *next;<br/>};<br/><br/>int main(int argc, char *argv[]) {<br/>";
    
    for (var i=0;i<declarations.length; i++) {
-       preContents += "  " + declarations[i] + ";\n";
+       preContents += "  " + declarations[i] + ";<br/>";
    }
-   preContents += "\n\n  return 0;\n}\n\n";
+   preContents += "<br/><br/>  return 0;<br/>}<br/><br/>";
 
 
    // Now for the questions:
@@ -74,47 +74,47 @@ exports.generateQuestion = function (randomStream){
    //  (2) Pointer variable, undecorated
 
    k = randomStream.nextIntRange(numTypes);
-   questions.push( { q: varNames[numTypes + k], a:  typeNames[numTypes + k] });
+   questions.push( { q: "<code>"+varNames[numTypes + k]+"</code>", a:  "<code>"+typeNames[numTypes + k]+"</code>" });
 
    //  (3) Non pointer variable with &
 
    k = randomStream.nextIntRange(numTypes);
-   questions.push( { q: "&" + varNames[k], a:  typeNames[k] + " *" });
+   questions.push( { q: "<code>&" + varNames[k]+"</code>", a:  "<code>"+typeNames[k] + " *</code>" });
 
    //  (4) Pointer variables with &
 
    k = randomStream.nextIntRange(numTypes);
-   questions.push( { q: "&" + varNames[numTypes + k], a:  typeNames[numTypes + k] + "*" });
+   questions.push( { q: "<code>&" + varNames[numTypes + k]+"</code>", a:  "<code>"+typeNames[numTypes + k] + "*</code>" });
 
    //  (5) Pointer variable, deferenced
 
    k = randomStream.nextIntRange(numTypes);
-   questions.push( { q: "*" + varNames[numTypes + k], a:  typeNames[numTypes + k].replace(" *","") });
+   questions.push( { q: "<code>*" + varNames[numTypes + k]+"</code>", a:  "<code>"+typeNames[numTypes + k].replace(" *","")+"</code>" });
 
    //  (6) argc  
 
-   questions.push( { q: "argc", a: "int"});
+   questions.push( { q: "<code>argc</code>", a: "<code>int</code>"});
 
    //  (7) argv[0]  
 
-   questions.push( { q: "argv[0]", a: "char *"});
+   questions.push( { q: "<code>argv[0]</code>", a: "<code>char *</code>"});
 
    //  (8) argv[1][2]  
 
-   questions.push( { q: "argv[1][2]", a: "char"});
+   questions.push( { q: "<code>argv[1][2]</code>", a: "<code>char</code>"});
 
    //  (9) Node * with arrow to next
 
    var nodeStar = typeNames.indexOf("Node *");
-   questions.push( { q: varNames[nodeStar]+"->next", a: "Node *" });
+   questions.push( { q: "<code>"+varNames[nodeStar]+"->next</code>", a: "<code>Node *</code>" });
    
    //  (10) Node * with arrow to data
 
-   questions.push( { q: varNames[nodeStar]+"->data", a: "int" });
+   questions.push( { q: "<code>"+varNames[nodeStar]+"->data</code>", a: "<code>int</code>" });
 
    // (11) Two levels of pointer
 
-   questions.push( { q: varNames[nodeStar]+"->next->next", a: "Node *" });
+   questions.push( { q: "<code>"+varNames[nodeStar]+"->next->next</code>", a: "<code>Node *</code>" });
 
    randomStream.shuffle(questions);
 
