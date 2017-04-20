@@ -69,7 +69,7 @@ exports.generateQuestion = function (randomStream){
 
    //  (1) Non pointer variable, undecorated
    k = randomStream.nextIntRange(numTypes);
-   questions.push( { q: varNames[k], a:  typeNames[k] });
+   questions.push( { q: "<code>"+varNames[k]+"</code>", a:  "<code>"+typeNames[k]+"</code>"});
 
    //  (2) Pointer variable, undecorated
 
