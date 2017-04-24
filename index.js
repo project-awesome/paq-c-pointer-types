@@ -142,6 +142,10 @@ exports.generate = function(randomStream, quizElement) {
             "questionText" : fullQuestionAndAnswer.questions[i].q,
             "answer" : fullQuestionAndAnswer.questions[i].a,
         };
+        if ("title" in quizElement) {
+            newQuestion.title = quizElement.title;
+        }
+
         // XXX consider changing this to points per sub part and putting in params
         //     also consider a warning if points and points per sub are provided and don't sync
         if ("points" in quizElement) {
