@@ -1,0 +1,26 @@
+{
+  "name": "paq-C-pointer-types",
+  "version": "0.0.0",
+  "description": "Project Awesome Question, Pointer Types in C",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --recursive"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MichelleCraig/paq-C-pointer-types.git"
+  },
+  "author": "Michelle Craig <mcraig@cs.toronto.edu> ",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MichelleCraig/paq-C-pointer-types/issues"
+  },
+  "homepage": "https://github.com/project-awesome/paq-C-pointer-types#readme",
+  "devDependencies": {
+    "ajv": "^3.8.3",
+    "chai": "^3.4.0",
+    "mocha": "^2.3.3",
+    "random-bits": "git+https://git@github.com/project-awesome/pa-random-bits.git#v1.0.0",
+    "sinon": "^1.17.2"
+  }
+}
