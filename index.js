@@ -6,6 +6,7 @@ exports.title = "C Pointer Types";
 // one param we could add is points per question? 
 // no code for generating answers
 
+exports.paramSchema = {}
 
 exports.generateQuestion = function (randomStream){ 
 
